@@ -43,7 +43,7 @@ public class AutoBlock extends Module {
     public final ModeProperty mode = new ModeProperty("Mode", 0, new String[]{"Hypixel", "Slinky"});
     public final BooleanProperty requireRightClick = new BooleanProperty("RequireRightClick", true);
     public final BooleanProperty requireLeftClick = new BooleanProperty("RequireLeftClick", false, () -> this.mode.getValue() == 1);
-    public final BooleanProperty requireDamaged = new BooleanProperty("RequireDamaged", false, () -> this.mode.getValue() == 1);
+    public final BooleanProperty requireDamaged = new BooleanProperty("RequireDamaged", true, () -> this.mode.getValue() == 1);
     public final FloatProperty range = new FloatProperty("Range", 6.0F, 3.0F, 8.0F);
     public final IntProperty fov = new IntProperty("FOV", 360, 30, 360);
     public final FloatProperty cps = new FloatProperty("CPS", 8.0F, 1.0F, 10.0F, () -> this.mode.getValue() == 0);
@@ -54,6 +54,7 @@ public class AutoBlock extends Module {
     public final IntProperty lagMaxDuration = new IntProperty("LagMaxDuration", 175, 25, 500, () -> this.mode.getValue() == 1 && this.lagChance.getValue() > 0);
     public final BooleanProperty preventDelayingAttacks = new BooleanProperty("PreventAttackDelay", true, () -> this.mode.getValue() == 1 && this.lagChance.getValue() > 0);
     public final BooleanProperty blockAgainImmediately = new BooleanProperty("BlockAgain", true, () -> this.mode.getValue() == 1 && this.lagChance.getValue() > 0);
+    public final BooleanProperty noSlowSpoof = new BooleanProperty("NoSlowSpoof", false);
     public final BooleanProperty throughWalls = new BooleanProperty("ThroughWalls", true);
     public final BooleanProperty teams = new BooleanProperty("Teams", true);
     public final BooleanProperty botCheck = new BooleanProperty("BotCheck", true);
@@ -152,7 +153,7 @@ public class AutoBlock extends Module {
         long now = System.currentTimeMillis();
         boolean valid = this.canAutoBlock() && this.hasValidTarget() && this.matchesSlinkyConditions();
         if (!valid) {
-            this.resetState(false);
+            this.resetState(true);
             return;
         }
 
@@ -260,7 +261,7 @@ public class AutoBlock extends Module {
             int timeUntilVulnerable = Math.max(0, mc.thePlayer.hurtResistantTime * 50);
             return timeUntilVulnerable <= this.maxHurtTime.getValue();
         }
-        return true;
+        return false;
     }
 
     private void startSlinkyBlock(long now) {
@@ -377,7 +378,7 @@ public class AutoBlock extends Module {
     }
 
     private void spoofNoSlowSlot() {
-        if (Myau.moduleManager.modules.get(NoSlow.class).isEnabled()) {
+        if (this.noSlowSpoof.getValue() && Myau.moduleManager.modules.get(NoSlow.class).isEnabled()) {
             int randomSlot = this.random.nextInt(9);
             while (randomSlot == mc.thePlayer.inventory.currentItem) {
                 randomSlot = this.random.nextInt(9);
