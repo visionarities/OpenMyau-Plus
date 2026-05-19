@@ -50,6 +50,17 @@ public abstract class MixinMinecraft {
     }
 
     @Inject(
+            method = {"runGameLoop"},
+            at = {@At("HEAD")}
+    )
+    private void pollModuleKeyBinds(CallbackInfo callbackInfo) {
+        // Keep module binds responsive even when the Timer module slows Minecraft's runTick loop.
+        if (Myau.moduleManager != null) {
+            Myau.moduleManager.pollKeyBinds(this.currentScreen == null);
+        }
+    }
+
+    @Inject(
             method = {"startGame"},
             at = {@At("HEAD")}
     )

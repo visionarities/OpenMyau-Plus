@@ -9,6 +9,7 @@ import myau.management.RotationState;
 import myau.module.Module;
 import myau.property.properties.BooleanProperty;
 import myau.property.properties.FloatProperty;
+import myau.property.properties.IntProperty;
 import myau.property.properties.ModeProperty;
 import myau.property.properties.PercentProperty;
 import myau.util.*;
@@ -61,6 +62,8 @@ public class Scaffold extends Module {
     private int towerDelay = 0;
     private int stage = 0;
     private int startY = 256;
+    // Counts how many airborne ticks TELLY has already forced sneak for.
+    private int tellyAirSneakTicks = 0;
     private boolean shouldKeepY = false;
     private boolean towering = false;
     private EnumFacing targetFacing = null;
@@ -69,6 +72,8 @@ public class Scaffold extends Module {
     public final FloatProperty tellystartrotationmaxspeed = new FloatProperty("telly-start-rotation-max-speed", 95.0F, 1.0F, 180.0F, () -> this.keepY.getValue() == 3);
     public final FloatProperty tellynormalrotationminspeed = new FloatProperty("telly-normal-rotation-min-speed", 30.0F, 1.0F, 180.0F, () -> this.keepY.getValue() == 3);
     public final FloatProperty tellynormalrotationmaxspeed = new FloatProperty("telly-normal-rotation-max-speed", 35.0F, 1.0F, 180.0F, () -> this.keepY.getValue() == 3);
+    // How long TELLY should sneak after leaving the ground. Default is the 4-tick timing you suggested.
+    public final IntProperty tellyAirSneakTicksValue = new IntProperty("telly-air-sneak-ticks", 4, 0, 10, () -> this.keepY.getValue() == 3 || this.tower.getValue() == 3);
     public final ModeProperty moveFix = new ModeProperty("move-fix", 1, new String[]{"NONE", "SILENT"});
     public final ModeProperty sprintMode = new ModeProperty("sprint", 0, new String[]{"NONE", "VANILLA"});
     public final PercentProperty groundMotion = new PercentProperty("ground-motion", 100);
@@ -243,6 +248,23 @@ public class Scaffold extends Module {
         } else {
             return false;
         }
+    }
+
+    private boolean shouldTellyAirSneak() {
+        // Only apply this during the first airborne ticks of TELLY keep-y/tower.
+        if (this.tellyAirSneakTicksValue.getValue() <= 0 || mc.thePlayer.onGround || mc.thePlayer.isCollidedHorizontally) {
+            return false;
+        }
+        if (!MoveUtil.isForwardPressed() || !ItemUtil.isHoldingBlock()) {
+            return false;
+        }
+        if (this.disableWhileJumpActive.getValue() && mc.thePlayer.isPotionActive(Potion.jump)) {
+            return false;
+        }
+
+        boolean keepYTelly = this.keepY.getValue() == 3 && this.stage > 0;
+        boolean towerTelly = this.tower.getValue() == 3 && mc.gameSettings.keyBindJump.isKeyDown();
+        return keepYTelly || towerTelly;
     }
 
     public Scaffold() {
@@ -667,6 +689,19 @@ public class Scaffold extends Module {
             if (mc.thePlayer.onGround && this.stage > 0 && MoveUtil.isForwardPressed()) {
                 mc.thePlayer.movementInput.jump = true;
             }
+            if (mc.thePlayer.onGround || !this.shouldTellyAirSneak()) {
+                // Start a fresh 4-tick TELLY sneak window next time we leave the ground.
+                this.tellyAirSneakTicks = 0;
+            } else if (this.tellyAirSneakTicks < this.tellyAirSneakTicksValue.getValue()) {
+                boolean wasSneaking = mc.thePlayer.movementInput.sneak;
+                mc.thePlayer.movementInput.sneak = true;
+                if (!wasSneaking) {
+                    // Minecraft applies this slowdown for real sneaking, so mirror it when we force sneak.
+                    mc.thePlayer.movementInput.moveForward *= 0.3F;
+                    mc.thePlayer.movementInput.moveStrafe *= 0.3F;
+                }
+                this.tellyAirSneakTicks++;
+            }
         }
     }
 
@@ -779,6 +814,7 @@ public class Scaffold extends Module {
         this.canRotate = false;
         this.towerTick = 0;
         this.towerDelay = 0;
+        this.tellyAirSneakTicks = 0;
         this.towering = false;
     }
 
@@ -787,6 +823,7 @@ public class Scaffold extends Module {
         if (mc.thePlayer != null && this.lastSlot != -1) {
             mc.thePlayer.inventory.currentItem = this.lastSlot;
         }
+        this.tellyAirSneakTicks = 0;
     }
 
     public int getBlockCount() {
