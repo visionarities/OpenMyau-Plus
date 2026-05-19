@@ -7,8 +7,6 @@ import myau.ui.Component;
 import myau.ui.dataset.BindStage;
 import myau.util.KeyBindUtil;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,18 +41,11 @@ public class BindComponent implements Component {
     }
 
     public void mouseDown(int x, int y, int button) {
-        if (this.isHovered(x, y) && button == 0 && this.parentModule.panelExpand) {
-            this.isBinding = !this.isBinding;
-        } else if (this.isBinding && this.parentModule.panelExpand) {
-            int keyIndex = button - 100;
-            
-            if (button == 0) {
-                this.isBinding = false;
-                return;
-            }
-            
-            this.parentModule.mod.setKey(keyIndex);
+        if (this.isBinding && this.parentModule.panelExpand) {
+            this.parentModule.mod.setKey(button - 100);
             this.isBinding = false;
+        } else if (this.isHovered(x, y) && button == 0 && this.parentModule.panelExpand) {
+            this.isBinding = !this.isBinding;
         }
     }
 
@@ -101,6 +92,10 @@ public class BindComponent implements Component {
     @Override
     public boolean isVisible() {
         return true;
+    }
+
+    public boolean isBinding() {
+        return this.isBinding;
     }
 
     private void renderText(String s, int color) {

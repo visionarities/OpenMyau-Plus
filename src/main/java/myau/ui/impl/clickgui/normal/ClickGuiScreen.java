@@ -36,6 +36,7 @@ public class ClickGuiScreen extends GuiScreen {
         List<Module> combatModules = Arrays.asList(
                 Myau.moduleManager.getModule(AimAssist.class),
                 Myau.moduleManager.getModule(AutoClicker.class),
+                Myau.moduleManager.getModule(AutoBlock.class),
                 Myau.moduleManager.getModule(KillAura.class),
                 Myau.moduleManager.getModule(Wtap.class),
                 Myau.moduleManager.getModule(Velocity.class),

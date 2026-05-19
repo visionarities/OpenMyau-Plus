@@ -1,5 +1,6 @@
 package myau.module.modules;
 
+import myau.Myau;
 import myau.event.EventTarget;
 import myau.events.TickEvent;
 import myau.mixin.IAccessorEntityLivingBase;
@@ -37,6 +38,12 @@ public class Sprint extends Module {
         if (this.isEnabled()) {
             switch (event.getType()) {
                 case PRE:
+                    Scaffold scaffold = (Scaffold) Myau.moduleManager.modules.get(Scaffold.class);
+                    if (scaffold != null && scaffold.isEnabled() && scaffold.shouldStopSprint()) {
+                        // Let Scaffold own sprint state when its sprint mode is NONE.
+                        KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
+                        break;
+                    }
                     KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
                     break;
                 case POST:

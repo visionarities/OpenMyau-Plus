@@ -135,6 +135,15 @@ public class ModuleComponent implements Component {
     }
 
     public void mouseDown(int x, int y, int button) {
+        if (isBinding()) {
+            for (Component c : this.settings) {
+                if (c instanceof BindComponent) {
+                    c.mouseDown(x, y, button);
+                    return;
+                }
+            }
+        }
+
         if (this.isHovered(x, y) && button == 0) {
             this.mod.toggle();
         }
@@ -176,6 +185,15 @@ public class ModuleComponent implements Component {
         return x > this.category.getX() && x < this.category.getX() + this.category.getWidth() && y > this.category.getY() + this.offsetY && y < this.category.getY() + 16 + this.offsetY;
     }
 
+    public boolean isBinding() {
+        if (!panelExpand) return false;
+        for (Component c : this.settings) {
+            if (c instanceof BindComponent && ((BindComponent) c).isBinding()) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     @Override
     public boolean isVisible() {

@@ -79,6 +79,7 @@ public class Myau {
         moduleManager.modules.put(KnockbackDelay.class, new KnockbackDelay());
         moduleManager.modules.put(TargetESP.class, new TargetESP());
         moduleManager.modules.put(AutoHeal.class, new AutoHeal());
+        moduleManager.modules.put(AutoBlock.class, new AutoBlock());
         moduleManager.modules.put(AutoTool.class, new AutoTool());
         moduleManager.modules.put(AutoSwap.class, new AutoSwap());
         moduleManager.modules.put(BedNuker.class, new BedNuker());

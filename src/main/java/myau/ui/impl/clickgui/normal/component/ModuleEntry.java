@@ -173,6 +173,11 @@ public class ModuleEntry extends Component {
 
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton, int scrollOffset) {
+        if (isBinding()) {
+            bindMouseButton(mouseButton);
+            return true;
+        }
+
         if (isMouseOverHeader(mouseX, mouseY, scrollOffset)) {
             if (mouseButton == 0) {
                 module.toggle();
@@ -207,6 +212,17 @@ public class ModuleEntry extends Component {
             }
         }
         return false;
+    }
+
+    private void bindMouseButton(int mouseButton) {
+        if (!expanded) return;
+        for (Component comp : propertiesComponents) {
+            if (!isComponentVisible(comp)) continue;
+            if (comp instanceof KeybindComponent && ((KeybindComponent) comp).isBinding()) {
+                ((KeybindComponent) comp).bindMouseButton(mouseButton);
+                return;
+            }
+        }
     }
 
     @Override

@@ -9,6 +9,7 @@ import myau.module.Module;
 import myau.module.modules.*;
 import myau.module.modules.Timer;
 import myau.ui.components.CategoryComponent;
+import myau.ui.components.ModuleComponent;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
 import myau.font.CFontRenderer;
@@ -34,6 +35,7 @@ public class ClickGui extends GuiScreen {
         List<Module> combatModules = new ArrayList<>();
         combatModules.add(Myau.moduleManager.getModule(AimAssist.class));
         combatModules.add(Myau.moduleManager.getModule(AutoClicker.class));
+        combatModules.add(Myau.moduleManager.getModule(AutoBlock.class));
         combatModules.add(Myau.moduleManager.getModule(KillAura.class));
         combatModules.add(Myau.moduleManager.getModule(Wtap.class));
         combatModules.add(Myau.moduleManager.getModule(Velocity.class));
@@ -218,6 +220,15 @@ public class ClickGui extends GuiScreen {
     }
 
     public void mouseClicked(int x, int y, int mouseButton) {
+        if (isBinding()) {
+            for (CategoryComponent category : categoryList) {
+                for (Component component : category.getModules()) {
+                    component.mouseDown(x, y, mouseButton);
+                }
+            }
+            return;
+        }
+
         Iterator<CategoryComponent> btnCat = categoryList.iterator();
         while (true) {
             CategoryComponent category;
@@ -311,6 +322,17 @@ public class ClickGui extends GuiScreen {
     }
 
     public boolean doesGuiPauseGame() {
+        return false;
+    }
+
+    private boolean isBinding() {
+        for (CategoryComponent category : categoryList) {
+            for (Component component : category.getModules()) {
+                if (component instanceof ModuleComponent && ((ModuleComponent) component).isBinding()) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 

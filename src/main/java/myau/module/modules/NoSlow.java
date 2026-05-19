@@ -41,9 +41,11 @@ public class NoSlow extends Module {
 
     public boolean isSwordActive() {
         KillAura killAura = (KillAura) Myau.moduleManager.modules.get(KillAura.class);
+        AutoBlock autoBlock = (AutoBlock) Myau.moduleManager.modules.get(AutoBlock.class);
         if (killauraonly.getValue()) {
-            if (!killAura.isEnabled()) return false;
-            if (killAura.getTarget() == null) return false;
+            boolean killAuraActive = killAura.isEnabled() && killAura.getTarget() != null;
+            boolean autoBlockActive = autoBlock.isEnabled() && autoBlock.isBlocking();
+            if (!killAuraActive && !autoBlockActive) return false;
         }
         return this.swordMode.getValue() != 0 && ItemUtil.isHoldingSword();
     }

@@ -114,6 +114,14 @@ public class Frame extends Component {
 
     @Override
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton, int scrollOffset) {
+        if (expanded) {
+            for (ModuleEntry entry : moduleEntries) {
+                if (entry.isBinding()) {
+                    return entry.mouseClicked(mouseX, mouseY, mouseButton, scrollOffset);
+                }
+            }
+        }
+
         if (isMouseOverHeader(mouseX, mouseY, scrollOffset)) {
             if (mouseButton == 0) {
                 this.dragging = true;

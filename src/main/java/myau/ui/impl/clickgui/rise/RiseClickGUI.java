@@ -61,7 +61,7 @@ public class RiseClickGUI extends GuiScreen {
     static {
         map(Tab.GHOST, "AimAssist", "AutoClicker", "Reach", "Velocity", "WTap", "Wtap", "HitBox",
                 "HitSelect", "BackTrack", "MoreKB", "KnockbackDelay", "ClickAssits", "SprintReset", "BlockHit");
-        map(Tab.COMBAT, "KillAura", "TargetStrafe", "NoHitDelay", "AntiFireball", "LagRange", "Refill",
+        map(Tab.COMBAT, "AutoBlock", "KillAura", "TargetStrafe", "NoHitDelay", "AntiFireball", "LagRange", "Refill",
                 "Criticals", "Displace", "ServerLag");
         map(Tab.MOVEMENT, "AntiAFK", "Fly", "FastBow", "Speed", "LongJump", "Sprint", "SafeWalk",
                 "Jesus", "NoFall", "NoSlow", "KeepSprint", "Eagle", "NoJumpDelay");
@@ -508,6 +508,13 @@ public class RiseClickGUI extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         if (closing) return;
+
+        for (RiseModuleCard card : allCards) {
+            if (card.isBindingKey()) {
+                card.mouse(mouseButton);
+                return;
+            }
+        }
 
         if (mouseButton == 0 && mouseX >= windowX && mouseX <= windowX + WINDOW_W
                 && mouseY >= windowY && mouseY <= windowY + 15) {

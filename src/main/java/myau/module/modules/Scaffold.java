@@ -90,13 +90,9 @@ public class Scaffold extends Module {
     public final BooleanProperty itemSpoof = new BooleanProperty("item-spoof", false);
     public final BooleanProperty blockCounter = new BooleanProperty("block-counter", true);
 
-    private boolean shouldStopSprint() {
-        if (this.isTowering()) {
-            return false;
-        } else {
-            boolean stage = this.keepY.getValue() == 1 || this.keepY.getValue() == 2;
-            return (!stage || this.stage <= 0) && this.sprintMode.getValue() == 0;
-        }
+    public boolean shouldStopSprint() {
+        // "sprint: NONE" should mean no sprint during Scaffold at all, including diagonal and tower states.
+        return this.sprintMode.getValue() == 0;
     }
 
     private boolean canPlace() {
@@ -718,6 +714,7 @@ public class Scaffold extends Module {
                 mc.thePlayer.movementInput.moveStrafe *= speed;
             }
             if (this.shouldStopSprint()) {
+                KeyBindUtil.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), false);
                 mc.thePlayer.setSprinting(false);
             }
         }

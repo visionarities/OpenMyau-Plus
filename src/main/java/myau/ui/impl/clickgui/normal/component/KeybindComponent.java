@@ -62,6 +62,11 @@ public class KeybindComponent extends Component {
     }
 
     public boolean mouseClicked(int mouseX, int mouseY, int mouseButton, int scrollOffset) {
+        if (this.binding) {
+            module.setKey(mouseButton - 100);
+            this.binding = false;
+            return true;
+        }
         if (isMouseOver(mouseX, mouseY, scrollOffset) && mouseButton == 0) {
             this.binding = !this.binding;
             return true;
@@ -86,5 +91,12 @@ public class KeybindComponent extends Component {
 
     @Override
     public void mouseReleased(int mouseX, int mouseY, int mouseButton) {
+    }
+
+    public void bindMouseButton(int mouseButton) {
+        if (this.binding) {
+            module.setKey(mouseButton - 100);
+            this.binding = false;
+        }
     }
 }
