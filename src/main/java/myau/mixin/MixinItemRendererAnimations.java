@@ -37,6 +37,10 @@ public abstract class MixinItemRendererAnimations {
                  ordinal = 2)
     )
     private void skipTransform(ItemRenderer instance, float f1, float f2) {
+        AnimationConfig.sync();
+        if (!AnimationConfig.isEnabled()) {
+            transformFirstPersonItem(f1, f2);
+        }
         // Suppressed — animations replaces this below
     }
 
@@ -46,8 +50,8 @@ public abstract class MixinItemRendererAnimations {
                  target = "Lnet/minecraft/client/renderer/ItemRenderer;doBlockTransformations()V")
     )
     public void applyAnimTransform(float partialTicks, CallbackInfo ci) {
-        if (!AnimationConfig.isEnabled()) return;
         AnimationConfig.sync();
+        if (!AnimationConfig.isEnabled()) return;
 
         IAccessorItemRendererAnimations acc = (IAccessorItemRendererAnimations) this;
         float equippedProgress     = acc.getEquippedProgress();
@@ -164,8 +168,8 @@ public abstract class MixinItemRendererAnimations {
                  shift = At.Shift.BEFORE)
     )
     public void applyScale(float partialTicks, CallbackInfo ci) {
-        if (!AnimationConfig.isEnabled()) return;
         AnimationConfig.sync();
+        if (!AnimationConfig.isEnabled()) return;
         double s = (double) AnimationConfig.getScale() / 100.0D;
         GL11.glScaled(s, s, s);
     }

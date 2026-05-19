@@ -19,8 +19,8 @@ public abstract class MixinEntityLivingBaseAnimations {
      */
     @Overwrite
     private int getArmSwingAnimationEnd() {
-        if (!AnimationConfig.isEnabled()) return 6;
         AnimationConfig.sync();
+        if (!AnimationConfig.isEnabled()) return 6;
         int pct = Math.max(0, Math.min(AnimationConfig.getSwingSpeed(), 100));
         return (int)(6.0D + (double) pct / 100.0D * 14.0D);
     }
